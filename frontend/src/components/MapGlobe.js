@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import DisasterOverlay from './DisasterOverlay';
 import LocalNewsPanel from './LocalNewsPanel';
+import SocialFeedPanel from './SocialFeedPanel';
 
 // Note: Ensure mapbox token is set in .env as REACT_APP_MAPBOX_TOKEN
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN || 'pk.ey...'; // Placeholder
@@ -14,6 +15,7 @@ const MapGlobe = () => {
     
     const [globalAlerts, setGlobalAlerts] = useState([]);
     const [selectedAlert, setSelectedAlert] = useState(null);
+    const [routePlotted, setRoutePlotted] = useState(false);
 
     // Fetch initial global alerts on mount
     useEffect(() => {
@@ -83,12 +85,74 @@ const MapGlobe = () => {
 
     const closeOverlay = () => {
         setSelectedAlert(null);
+        if (map.current.getLayer('safe-route')) {
+            map.current.removeLayer('safe-route');
+            map.current.removeSource('safe-route');
+        }
+        setRoutePlotted(false);
         map.current.flyTo({
             zoom: 1.5,
             pitch: 0,
             essential: true,
             duration: 2500
         });
+    };
+
+    const plotEmergencyRoute = async () => {
+        if (!selectedAlert || !map.current || routePlotted) return;
+        
+        try {
+            // Find a mock "nearest hospital/fire station" about ~0.5 degrees away
+            const dest_lat = selectedAlert.lat + 0.05;
+            const dest_lng = selectedAlert.lng - 0.05;
+            
+            const res = await fetch('http://localhost:8000/analyze-disaster', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lat: selectedAlert.lat,
+                    lng: selectedAlert.lng,
+                    dest_lat: dest_lat,
+                    dest_lng: dest_lng
+                })
+            });
+            const data = await res.json();
+            
+            if (data.status === 'success' && data.route) {
+                // Add route source and layer to mapbox
+                map.current.addSource('safe-route', {
+                    'type': 'geojson',
+                    'data': data.route
+                });
+                
+                map.current.addLayer({
+                    'id': 'safe-route',
+                    'type': 'line',
+                    'source': 'safe-route',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#ff0000',
+                        'line-width': 6,
+                        'line-opacity': 0.8
+                    }
+                });
+
+                // Add marker for hospital/firestation
+                const el = document.createElement('div');
+                el.innerHTML = '🏥';
+                el.style.fontSize = '24px';
+                new mapboxgl.Marker(el)
+                    .setLngLat([dest_lng, dest_lat])
+                    .addTo(map.current);
+
+                setRoutePlotted(true);
+            }
+        } catch (err) {
+            console.error("Failed to calculate route:", err);
+        }
     };
 
     return (
@@ -141,8 +205,13 @@ const MapGlobe = () => {
             </div>
 
             {/* Overlays rendered dynamically */}
-            <LocalNewsPanel alert={selectedAlert} />
-            <DisasterOverlay alert={selectedAlert} onClose={closeOverlay} />
+            <SocialFeedPanel alert={selectedAlert} />
+            <DisasterOverlay 
+                alert={selectedAlert} 
+                onClose={closeOverlay} 
+                onPlotRoute={plotEmergencyRoute}
+                routePlotted={routePlotted}
+            />
             
         </div>
     );

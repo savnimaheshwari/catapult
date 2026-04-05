@@ -1,0 +1,59 @@
+INFO:     Will watch for changes in these directories: ['/Users/savni/Desktop/catapult/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [49310] using WatchFiles
+INFO:     Started server process [49354]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:56396 - "OPTIONS /auth/world-id/prepare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56397 - "OPTIONS /auth/world-id/prepare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56396 - "POST /auth/world-id/prepare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56397 - "POST /auth/world-id/prepare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56396 - "GET /global-alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56396 - "GET /global-alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56396 - "GET /social-feed/santarosa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56398 - "GET /santa_rosa_wildfire_pre/santa-rosa-wildfire_00000066_pre_disaster.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56399 - "GET /social-feed/harvey HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56400 - "GET /hurrican_harvey_pre/hurricane-harvey_00000078_pre_disaster.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56401 - "GET /social-feed/florence HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56402 - "GET /hurricane_florence_pre/hurricane-florence_00000004_pre_disaster.png HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [49354]
+INFO:     Started server process [50783]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [50783]
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001fea07100 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001fea07100 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001fea07100 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'main.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001fea07100 (most recent call first):
+  <no Python frame>
+INFO:     Stopping reloader process [49310]
