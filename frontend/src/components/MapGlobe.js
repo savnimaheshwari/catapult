@@ -197,7 +197,7 @@ const MapGlobe = () => {
                 pointerEvents: 'none' // Let clicks pass through if map is under
             }}>
                 <h1 style={{ margin: '0', fontSize: '28px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>
-                    🌍 TerraForm <span style={{color: '#ff0b0b'}}>Alerts</span>
+                    🌍 ProjectSendHelp <span style={{color: '#ff0b0b'}}>Alerts</span>
                 </h1>
                 <p style={{ margin: '8px 0 0 0', opacity: 0.8, fontSize: '15px' }}>
                     {selectedAlert ? "Viewing Satellite Intel" : "Select an active global disaster region to view xBD intelligence."}

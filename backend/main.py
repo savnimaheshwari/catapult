@@ -20,7 +20,7 @@ RP_ID = os.getenv("RP_ID")
 # Fallback for the key name seen earlier
 WORLD_RP_SIGNING_KEY = os.getenv("WORLD_RP_SIGNING_KEY") or os.getenv("REACT_APP_WORLD_SIGNING_KEY")
 
-app = FastAPI(title="TerraForm Response API")
+app = FastAPI(title="ProjectSendHelp API")
 
 sample_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../sample_data"))
 if os.path.exists(sample_data_dir):

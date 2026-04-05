@@ -1,8 +1,8 @@
-# 🌍 TerraForm Response
+# 🌍 ProjectSendHelp
 
 > **"Reducing the 48-hour disaster assessment window to 48 seconds."**
 
-TerraForm Response is a disaster intelligence platform built for FEMA and emergency-response agencies. It processes real-time post-disaster satellite imagery through deep learning models to give first responders instant situational awareness — identifying disaster types, mapping affected buildings, and surfacing live news — all from a cinematic 3D globe interface.
+ProjectSendHelp is a disaster intelligence platform built for FEMA and emergency-response agencies. It processes real-time post-disaster satellite imagery through deep learning models to give first responders instant situational awareness — identifying disaster types, mapping affected buildings, and surfacing live news — all from a cinematic 3D globe interface.
 
 ---
 
@@ -33,6 +33,25 @@ A minimizable capsule in the bottom-left corner simulates a live social intellig
 
 ### 🔒 Proof-of-Human Verification
 Access to the platform is gated by **World ID** (by Worldcoin), a sybil-resistant Proof-of-Human protocol. This ensures only verified humans — not bots — can interact with the emergency infrastructure.
+
+---
+
+## Dataset
+
+All models were trained and evaluated on the **[xBD Dataset](https://xview2.org/)** (xView2 Building Damage), the industry-standard benchmark for satellite-based disaster damage assessment. xBD contains over 850,000 building annotations across 19 different disaster events worldwide, captured via GeoEye-1 and WorldView-2/3 satellites at sub-meter resolution.
+
+---
+
+## Models Developed
+
+Four deep learning models were built and trained as part of this project:
+
+| Model | What it does | Best Accuracy |
+|---|---|---|
+| Pre/Post Classifier | Determines whether a satellite image was captured before or after a disaster event | **86.8%** test accuracy (AUC 0.95) |
+| Building Segmentation (U-Net) | Identifies and segments individual building footprints in a satellite scene | **93.4%** test accuracy |
+| Damage Classifier | Classifies each detected building into one of four damage levels: No Damage, Minor, Major, or Destroyed | **80.9%** test accuracy |
+| Disaster Type Classifier | Identifies the category of disaster (flooding, fire, earthquake, volcano, tsunami, wind) from the image | **73.8%** train accuracy |
 
 ---
 

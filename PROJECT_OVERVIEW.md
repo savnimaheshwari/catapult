@@ -1,13 +1,13 @@
-# 🌍 TerraForm Response
+# 🌍 ProjectSendHelp
 
-Welcome to **TerraForm Response**! This document provides an overview of what the platform is, what it does, and how it will be demonstrated to judges.
+Welcome to **ProjectSendHelp**! This document provides an overview of what the platform is, what it does, and how it will be demonstrated to judges.
 
 ---
 
-## 🚀 What is TerraForm Response?
+## 🚀 What is ProjectSendHelp?
 **"Infrastructure-as-a-Service for FEMA to reduce the 48-hour assessment window to 48 seconds."**
 
-TerraForm Response is a modern, full-stack disaster relief platform. It consists of a React-based frontend that renders a highly detailed, 3D cinematic Mapbox globe, and a Python FastAPI backend that functions as the "brain". 
+ProjectSendHelp is a modern, full-stack disaster relief platform. It consists of a React-based frontend that renders a highly detailed, 3D cinematic Mapbox globe, and a Python FastAPI backend that functions as the "brain". 
 
 The core goal of the project is to map out disaster zones (e.g., floods, earthquakes, hurricanes) rapidly and find optimal rescue routes using artificial intelligence and pathfinding algorithms. 
 
