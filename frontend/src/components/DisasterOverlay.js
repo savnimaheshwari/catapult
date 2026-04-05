@@ -144,7 +144,7 @@ const DisasterOverlay = ({ alert, onClose }) => {
                                 alignItems: 'center', cursor: 'pointer', padding: '4px 0'
                             }}
                         >
-                            <span>Metadata</span>
+                            <span>Info</span>
                             <span style={{ transform: isMetadataOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease' }}>
                                 ▼
                             </span>
