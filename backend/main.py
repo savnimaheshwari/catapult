@@ -67,36 +67,92 @@ async def global_alerts():
             {
                 "id": "harvey",
                 "title": "Hurricane Harvey",
-                "lat": 29.7604,
-                "lng": -95.3698,
-                "news": "Catastrophic flooding underway in Houston region. Heavy rains expected to persist for 48 hours.",
+                "lat": 29.6245,
+                "lng": -95.637,
+                "news": "Post-disaster flooding analysis in SW Houston suburbs. 140+ buildings assessed via WorldView-2 satellite imagery. Disaster type: flooding.",
                 "images": {
                     "pre": "http://localhost:8000/images/hurrican_harvey_pre/hurricane-harvey_00000078_pre_disaster.png",
                     "post": "http://localhost:8000/images/hurricance_harvey_post/hurricane-harvey_00000078_post_disaster.png"
+                },
+                "metadata": {
+                    "sensor": "WorldView-2",
+                    "capture_date": "February 16, 2017",
+                    "disaster_type": "Flooding",
+                    "image_tag": "pre_disaster",
+                    "gsd_m": 2.20,
+                    "pan_resolution_m": 0.55,
+                    "off_nadir_angle_deg": 24.51,
+                    "sun_azimuth_deg": 150.96,
+                    "sun_elevation_deg": 43.52,
+                    "target_azimuth_deg": 357.34,
+                    "image_dimensions_px": "1024 × 1024",
+                    "total_buildings": 140,
+                    "coordinate_system": "WGS84",
+                    "lng_range": [-95.640, -95.634],
+                    "lat_range": [29.622, 29.627],
+                    "location": "SW Houston Suburbs, Texas"
                 }
             },
             {
                 "id": "florence",
                 "title": "Hurricane Florence",
-                "lat": 34.2257,
-                "lng": -77.9447,
-                "news": "Storm surge warnings issued across entire Carolina coast. FEMA coordinating response.",
+                "lat": 33.6055,
+                "lng": -79.034,
+                "news": "Post-disaster flooding analysis near Conway, South Carolina. 80 buildings assessed via GeoEye-1 satellite imagery captured September 18, 2018.",
                 "images": {
                     "pre": "http://localhost:8000/images/hurricane_florence_pre/hurricane-florence_00000004_pre_disaster.png",
                     "post": "http://localhost:8000/images/hurrican_florence_post/hurricane-florence_00000004_post_disaster.png"
+                },
+                "metadata": {
+                    "sensor": "GeoEye-1",
+                    "capture_date": "September 18, 2018",
+                    "disaster_type": "Flooding",
+                    "image_tag": "post_disaster",
+                    "gsd_m": 2.9,
+                    "pan_resolution_m": 0.72,
+                    "off_nadir_angle_deg": 41.7,
+                    "sun_azimuth_deg": 162.7,
+                    "sun_elevation_deg": 57.0,
+                    "target_azimuth_deg": 69.0,
+                    "image_dimensions_px": "1024 × 1024",
+                    "total_buildings": 80,
+                    "coordinate_system": "WGS84",
+                    "lng_range": [-79.036, -79.032],
+                    "lat_range": [33.603, 33.607],
+                    "location": "Conway, South Carolina (near Myrtle Beach)"
                 }
             },
             {
                 "id": "santarosa",
                 "title": "Tubbs Wildfire",
-                "lat": 38.4404,
-                "lng": -122.7141,
-                "news": "Evacuation orders mandatory for Santa Rosa suburbs. Multiple homes structurally compromised.",
+                "lat": 38.4729,
+                "lng": -122.7438,
+                "news": "Pre-disaster aerial analysis of Santa Rosa suburbs. 120+ buildings mapped via GeoEye-1 satellite imagery. Disaster type: wildfire (Tubbs Fire, 2017).",
                 "images": {
                     "pre": "http://localhost:8000/images/santa_rosa_wildfire_pre/santa-rosa-wildfire_00000066_pre_disaster.png",
                     "post": "http://localhost:8000/images/santa_rosa_wildfire_post/santa-rosa-wildfire_00000066_post_disaster.png"
+                },
+                "metadata": {
+                    "sensor": "GeoEye-1",
+                    "capture_date": "June 21, 2017",
+                    "disaster_type": "Wildfire (Fire)",
+                    "image_tag": "pre_disaster",
+                    "gsd_m": 1.67,
+                    "pan_resolution_m": 0.42,
+                    "off_nadir_angle_deg": 5.67,
+                    "sun_azimuth_deg": 132.82,
+                    "sun_elevation_deg": 69.89,
+                    "target_azimuth_deg": 64.90,
+                    "image_dimensions_px": "1024 × 1024",
+                    "total_buildings": 120,
+                    "coordinate_system": "WGS84",
+                    "lng_range": [-122.746, -122.741],
+                    "lat_range": [38.471, 38.476],
+                    "location": "Santa Rosa, California",
+                    "catalog_id": "105001000A632800"
                 }
             }
+
         ]
     }
 
