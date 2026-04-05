@@ -10,8 +10,9 @@ import uuid
 import time
 import requests
 from dotenv import load_dotenv
-from ml_engine import simulate_xbd_analysis
+from ml_engine import load_models, classify_disaster, segment_buildings
 from pathfinder import calculate_safe_route
+import threading
 
 load_dotenv()
 
@@ -24,6 +25,10 @@ app = FastAPI(title="TerraForm Response API")
 sample_data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../sample_data"))
 if os.path.exists(sample_data_dir):
     app.mount("/images", StaticFiles(directory=sample_data_dir), name="images")
+
+test_images_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test/images"))
+if os.path.exists(test_images_dir):
+    app.mount("/test_images", StaticFiles(directory=test_images_dir), name="test_images")
 
 harvey_pics_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../harvey_pics"))
 if os.path.exists(harvey_pics_dir):
@@ -58,102 +63,134 @@ class ProofPayload(BaseModel):
 class RpSignatureRequest(BaseModel):
     action: str
 
+@app.on_event("startup")
+def startup_event():
+    threading.Thread(target=load_models, daemon=True).start()
+
 # --- Endpoints ---
 @app.get("/global-alerts")
 async def global_alerts():
+    """
+    Returns the active disaster hotspots (red alerts) to be rendered on the globe.
+    
+    SYSTEM ARCHITECTURE PIPELINE (How alerts are naturally generated):
+    1. INGESTION: The system listens to live data streams (X/Twitter Firehose, USGS hazard feeds, NOAA RSS).
+    2. KEYWORD ANALYSIS: NLP algorithms filter for a sudden localized influx of keywords like 'flood', 'rescue', 'fire'.
+    3. TRIAGE: Once a geographical threshold is met (e.g. 50+ emergency mentions within a 5-mile radius), a new Alert ID is minted.
+    4. SATELLITE TASKING: An automated webhook requests pre/post satellite imagery from Maxar/Planet for that exact coordinate.
+    5. This endpoint serves those active hotspots to the frontend React globe.
+    """
+    alerts_data = [
+        {
+            "id": "harvey",
+            "title": "Hurricane Harvey",
+            "lat": 29.74728748455649,
+            "lng": -95.53694363244546,
+            "news": "Post-disaster flooding analysis near Houston, TX. 197 structures assessed via GeoEye-1 satellite imagery captured August 31, 2017.",
+            "images": {
+                "pre": "http://localhost:8000/test_images/hurricane-harvey_00000483_pre_disaster.png",
+                "post": "http://localhost:8000/test_images/hurricane-harvey_00000483_post_disaster.png"
+            },
+            "metadata": {
+                "sensor": "GEOEYE01",
+                "capture_date": "2017-08-31T17:38:50.685Z",
+                "disaster_type": "Flooding",
+                "image_tag": "post_disaster",
+                "gsd_m": 2.2,
+                "pan_resolution_m": 0.55,
+                "off_nadir_angle_deg": 17.3,
+                "sun_azimuth_deg": 172.4,
+                "sun_elevation_deg": 59.7,
+                "target_azimuth_deg": 355.2,
+                "image_dimensions_px": "1024 \u00d7 1024",
+                "total_buildings": 197,
+                "coordinate_system": "WGS84",
+                "lng_range": [-95.542, -95.532],
+                "lat_range": [29.742, 29.752],
+                "location": "Houston, Texas",
+                "catalog_id": "105001000A00B300"
+            }
+        },
+        {
+            "id": "florence",
+            "title": "Hurricane Florence",
+            "lat": 34.68852161438465,
+            "lng": -77.97635795431499,
+            "news": "Post-disaster flooding analysis near Jacksonville, NC. 12 structures assessed via GeoEye-1 satellite imagery captured September 20, 2018.",
+            "images": {
+                "pre": "http://localhost:8000/test_images/hurricane-florence_00000235_pre_disaster.png",
+                "post": "http://localhost:8000/test_images/hurricane-florence_00000235_post_disaster.png"
+            },
+            "metadata": {
+                "sensor": "GEOEYE01",
+                "capture_date": "2018-09-20T16:04:41.000Z",
+                "disaster_type": "Flooding",
+                "image_tag": "post_disaster",
+                "gsd_m": 2.9,
+                "pan_resolution_m": 0.72,
+                "off_nadir_angle_deg": 25.1,
+                "sun_azimuth_deg": 162.7,
+                "sun_elevation_deg": 57.0,
+                "target_azimuth_deg": 69.0,
+                "image_dimensions_px": "1024 \u00d7 1024",
+                "total_buildings": 12,
+                "coordinate_system": "WGS84",
+                "lng_range": [-77.981, -77.971],
+                "lat_range": [34.683, 34.693],
+                "location": "Jacksonville, North Carolina",
+                "catalog_id": "103001007B4A7200"
+            }
+        },
+        {
+            "id": "santarosa",
+            "title": "Santa Rosa Wildfire",
+            "lat": 38.47229494455633,
+            "lng": -122.7450409829897,
+            "news": "Post-disaster fire analysis in Santa Rosa suburb. 160 structures assessed via GeoEye-1 satellite imagery during Tubbs Fire (2017).",
+            "images": {
+                "pre": "http://localhost:8000/test_images/santa-rosa-wildfire_00000066_pre_disaster.png",
+                "post": "http://localhost:8000/test_images/santa-rosa-wildfire_00000066_post_disaster.png"
+            },
+            "metadata": {
+                "sensor": "GEOEYE01",
+                "capture_date": "2017-10-15T18:45:00.000Z",
+                "disaster_type": "Fire",
+                "image_tag": "post_disaster",
+                "gsd_m": 1.67,
+                "pan_resolution_m": 0.42,
+                "off_nadir_angle_deg": 5.67,
+                "sun_azimuth_deg": 132.82,
+                "sun_elevation_deg": 69.89,
+                "target_azimuth_deg": 64.9,
+                "image_dimensions_px": "1024 \u00d7 1024",
+                "total_buildings": 160,
+                "coordinate_system": "WGS84",
+                "lng_range": [-122.75, -122.74],
+                "lat_range": [38.467, 38.477],
+                "location": "Santa Rosa, California",
+                "catalog_id": "105001000A632800"
+            }
+        }
+    ]
+
+    for alert in alerts_data:
+        post_url = alert["images"]["post"]
+        if post_url.startswith("http://localhost:8000/test_images/"):
+            rel_path = post_url.replace("http://localhost:8000/test_images/", "")
+            local_path = os.path.join(test_images_dir, rel_path)
+
+            predicted_type = classify_disaster(local_path)
+            if predicted_type != "Unknown":
+                alert["metadata"]["disaster_type"] = predicted_type
+
+            bounds = segment_buildings(local_path)
+            if bounds:
+                alert["metadata"]["building_bounds"] = bounds
+                alert["metadata"]["total_buildings"] = len(bounds)
+
     return {
         "status": "success",
-        "alerts": [
-            {
-                "id": "harvey",
-                "title": "Hurricane Harvey",
-                "lat": 29.6245,
-                "lng": -95.637,
-                "news": "Post-disaster flooding analysis in SW Houston suburbs. 140+ buildings assessed via WorldView-2 satellite imagery. Disaster type: flooding.",
-                "images": {
-                    "pre": "http://localhost:8000/images/hurrican_harvey_pre/hurricane-harvey_00000078_pre_disaster.png",
-                    "post": "http://localhost:8000/images/hurricance_harvey_post/hurricane-harvey_00000078_post_disaster.png"
-                },
-                "metadata": {
-                    "sensor": "WorldView-2",
-                    "capture_date": "February 16, 2017",
-                    "disaster_type": "Flooding",
-                    "image_tag": "pre_disaster",
-                    "gsd_m": 2.20,
-                    "pan_resolution_m": 0.55,
-                    "off_nadir_angle_deg": 24.51,
-                    "sun_azimuth_deg": 150.96,
-                    "sun_elevation_deg": 43.52,
-                    "target_azimuth_deg": 357.34,
-                    "image_dimensions_px": "1024 × 1024",
-                    "total_buildings": 140,
-                    "coordinate_system": "WGS84",
-                    "lng_range": [-95.640, -95.634],
-                    "lat_range": [29.622, 29.627],
-                    "location": "SW Houston Suburbs, Texas"
-                }
-            },
-            {
-                "id": "florence",
-                "title": "Hurricane Florence",
-                "lat": 33.6055,
-                "lng": -79.034,
-                "news": "Post-disaster flooding analysis near Conway, South Carolina. 80 buildings assessed via GeoEye-1 satellite imagery captured September 18, 2018.",
-                "images": {
-                    "pre": "http://localhost:8000/images/hurricane_florence_pre/hurricane-florence_00000004_pre_disaster.png",
-                    "post": "http://localhost:8000/images/hurrican_florence_post/hurricane-florence_00000004_post_disaster.png"
-                },
-                "metadata": {
-                    "sensor": "GeoEye-1",
-                    "capture_date": "September 18, 2018",
-                    "disaster_type": "Flooding",
-                    "image_tag": "post_disaster",
-                    "gsd_m": 2.9,
-                    "pan_resolution_m": 0.72,
-                    "off_nadir_angle_deg": 41.7,
-                    "sun_azimuth_deg": 162.7,
-                    "sun_elevation_deg": 57.0,
-                    "target_azimuth_deg": 69.0,
-                    "image_dimensions_px": "1024 × 1024",
-                    "total_buildings": 80,
-                    "coordinate_system": "WGS84",
-                    "lng_range": [-79.036, -79.032],
-                    "lat_range": [33.603, 33.607],
-                    "location": "Conway, South Carolina (near Myrtle Beach)"
-                }
-            },
-            {
-                "id": "santarosa",
-                "title": "Tubbs Wildfire",
-                "lat": 38.4729,
-                "lng": -122.7438,
-                "news": "Pre-disaster aerial analysis of Santa Rosa suburbs. 120+ buildings mapped via GeoEye-1 satellite imagery. Disaster type: wildfire (Tubbs Fire, 2017).",
-                "images": {
-                    "pre": "http://localhost:8000/images/santa_rosa_wildfire_pre/santa-rosa-wildfire_00000066_pre_disaster.png",
-                    "post": "http://localhost:8000/images/santa_rosa_wildfire_post/santa-rosa-wildfire_00000066_post_disaster.png"
-                },
-                "metadata": {
-                    "sensor": "GeoEye-1",
-                    "capture_date": "June 21, 2017",
-                    "disaster_type": "Wildfire (Fire)",
-                    "image_tag": "pre_disaster",
-                    "gsd_m": 1.67,
-                    "pan_resolution_m": 0.42,
-                    "off_nadir_angle_deg": 5.67,
-                    "sun_azimuth_deg": 132.82,
-                    "sun_elevation_deg": 69.89,
-                    "target_azimuth_deg": 64.90,
-                    "image_dimensions_px": "1024 × 1024",
-                    "total_buildings": 120,
-                    "coordinate_system": "WGS84",
-                    "lng_range": [-122.746, -122.741],
-                    "lat_range": [38.471, 38.476],
-                    "location": "Santa Rosa, California",
-                    "catalog_id": "105001000A632800"
-                }
-            }
-
-        ]
+        "alerts": alerts_data
     }
 
 @app.get("/social-feed/{alert_id}")
@@ -162,115 +199,61 @@ async def get_social_feed(alert_id: str):
     Simulates a clean API call pulling relevant social media/news data.
     Returns highly visual, fascinating data based on the alert.
     """
-    import random
+    import xml.etree.ElementTree as ET
+    import urllib.parse
     
-    # Mock databases with real-world-like feeds
-    feeds = {
-        "harvey": [
+    # Mapping of alert_id to search queries
+    queries = {
+        "harvey": "Hurricane Harvey Houston flooding",
+        "florence": "Hurricane Florence North Carolina",
+        "santarosa": "Santa Rosa Tubbs wildfire 2017"
+    }
+    
+    query_str = queries.get(alert_id, "Natural Disaster")
+    quoted_query = urllib.parse.quote(query_str)
+    url = f"https://news.google.com/rss/search?q={quoted_query}&hl=en-US&gl=US&ceid=US:en"
+    
+    feed = []
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            root = ET.fromstring(response.content)
+            items = root.findall('.//item')[:5] # Get top 5 news items
+            
+            for index, item in enumerate(items, 1):
+                title = item.find('title').text if item.find('title') is not None else "News Update"
+                pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ""
+                link = item.find('link').text if item.find('link') is not None else ""
+                source_elem = item.find('source')
+                source_name = source_elem.text if source_elem is not None else "Google News"
+                
+                feed.append({
+                    "id": f"news_{index}",
+                    "platform": source_name,
+                    "time": pub_date,
+                    "title": title,
+                    "url": link
+                })
+    except Exception as e:
+        print(f"Error fetching news: {e}")
+        
+    # Generic mock for unknown alerts or if fetch fails
+    if not feed:
+        feed = [
             {
-                "id": "t1",
-                "platform": "Twitter",
-                "author": "@sparklingLily (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop",
-                "time": "Aug 28, 2017",
-                "content": "#harveyrescue (retweet this!!) Amanda 8327696449 2 adults 5 kids (2 are babies) and a puppy 12606 Ellenview Dr Houston Texas",
-                "image": "http://localhost:8000/harvey_pics/harvey3.png"
-            },
-            {
-                "id": "t2",
-                "platform": "Twitter",
-                "author": "@RabbiJill (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=100&h=100&fit=crop",
-                "time": "Aug 28, 2017",
-                "content": "There's a woman with a 3 mo old baby who needs rescue now 8614 valley meadow Houston,Tx 77078 #harveyrescue please spread word",
-                "image": "http://localhost:8000/harvey_pics/hurriace_harvey3.png"
-            },
-            {
-                "id": "t3",
-                "platform": "Twitter",
-                "author": "@JoeyBadeyez (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1598257006458-087169a1f08d?w=100&h=100&fit=crop",
-                "time": "Aug 28, 2017",
-                "content": "Little girl on a ventilator needs rescue NOW! - 8305 Talton Houston - #harveyrescue #harveysos #rescue #sendhelpnow",
-                "image": "http://localhost:8000/harvey_pics/hurricane_harvey2.png"
-            }
-        ],
-        "florence": [
-            {
-                "id": "f1",
-                "platform": "Twitter",
-                "author": "@NewBernResident (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
-                "time": "Sep 14, 2018",
-                "content": "Trapped in our attic with rising floodwaters in New Bern, NC. Family of 4. We need immediate rescue! #HurricaneFlorence",
-                "image": "http://localhost:8000/florence_pics/florence.png"
-            },
-            {
-                "id": "f2",
-                "platform": "CrowdSource Rescue",
-                "author": "Wilmington Coord (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
-                "time": "Sep 15, 2018",
-                "content": "We have 150+ open tickets for water rescues in the Wilmington area. Need high water vehicles immediately. Routes 40 and 17 are completely submerged.",
-                "image": "http://localhost:8000/florence_pics/hurricane_florence.png"
-            }
-        ],
-        "santarosa": [
-            {
-                "id": "s1",
-                "platform": "Twitter",
-                "author": "@NorCalEvac (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?w=100&h=100&fit=crop",
-                "time": "Oct 9, 2017 · 2:31 AM",
-                "content": "Fountaingrove is completely engulfed. We had 5 minutes to leave. Please pray for Santa Rosa. The glow over the hills is terrifying. #TubbsFire #SantaRosaFire",
-                "image": "http://localhost:8000/images/santa_rosa_wildfire_post/santa-rosa-wildfire_00000066_post_disaster.png"
-            },
-            {
-                "id": "s2",
-                "platform": "Twitter",
-                "author": "@SonomaOES (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop",
-                "time": "Oct 9, 2017 · 3:14 AM",
-                "content": "MANDATORY EVACUATION orders in effect for: Coffey Park, Larkfield-Wikiup, Fountaingrove. Do NOT shelter in place. Leave NOW. Zero visibility on Hwy 101. #TubbsFire",
-                "image": "http://localhost:8000/images/santa_rosa_wildfire_post/santa-rosa-wildfire_00000284_post_disaster.png"
-            },
-            {
-                "id": "s3",
-                "platform": "Facebook Group",
-                "author": "Sonoma County Updates (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
-                "time": "Oct 9, 2017 · 4:02 AM",
-                "content": "Coffey Park neighborhood is gone. Devastating loss tonight. Kaiser hospital is evacuating patients now. Satellite imagery confirms multiple block radius destroyed. #TubbsFire",
-                "image": "http://localhost:8000/images/santa_rosa_wildfire_post/santa-rosa-wildfire_00000366_post_disaster.png"
-            },
-            {
-                "id": "s4",
-                "platform": "Twitter",
-                "author": "@CAL_FIRE (Historical)",
-                "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
-                "time": "Oct 9, 2017 · 5:45 AM",
-                "content": "Update: #TubbsFire has burned approx 25,000 acres with 0% containment. 17 structures confirmed destroyed. Wind gusts up to 79mph reported. All available air resources deployed at first light.",
+                "id": "g1",
+                "platform": "GlobalWatch",
+                "author": "System Monitor",
+                "avatar": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=100&h=100&fit=crop",
+                "time": "Active",
+                "content": "Monitoring regional chatter and emergency frequencies for updates.",
                 "image": None
             }
         ]
-    }
-    
-    # Generic mock for unknown alerts
-    generic_feed = [
-        {
-            "id": "g1",
-            "platform": "GlobalWatch",
-            "author": "System Monitor",
-            "avatar": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=100&h=100&fit=crop",
-            "time": "Active",
-            "content": "Monitoring regional chatter and emergency frequencies for updates.",
-            "image": None
-        }
-    ]
     
     return {
         "status": "success",
-        "feed": feeds.get(alert_id, generic_feed)
+        "feed": feed
     }
 
 @app.post("/auth/world-id/prepare")

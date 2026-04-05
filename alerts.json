@@ -1,0 +1,110 @@
+[
+    {
+        "id": "guatemala",
+        "title": "Guatemala Volcano",
+        "lat": 14.43845885230631,
+        "lng": -90.83554484998086,
+        "news": "Post-disaster volcano analysis. Disaster detected: guatemala-volcano.",
+        "images": {
+            "pre": "http://localhost:8000/test_images/guatemala-volcano_00000003_pre_disaster.png",
+            "post": "http://localhost:8000/test_images/guatemala-volcano_00000003_post_disaster.png"
+        },
+        "metadata": {
+            "sensor": "WORLDVIEW03_VNIR",
+            "capture_date": "2018-06-22T16:55:40.000Z",
+            "disaster_type": "Volcano",
+            "image_tag": "post_disaster",
+            "gsd_m": 1.41,
+            "pan_resolution_m": 0.35,
+            "off_nadir_angle_deg": 21.97,
+            "sun_azimuth_deg": 58.57,
+            "sun_elevation_deg": 71.18,
+            "target_azimuth_deg": 314.29,
+            "image_dimensions_px": "1024 \u00d7 1024",
+            "total_buildings": 3,
+            "coordinate_system": "WGS84",
+            "lng_range": [
+                -90.841,
+                -90.831
+            ],
+            "lat_range": [
+                14.433,
+                14.443
+            ],
+            "location": "Guatemala",
+            "catalog_id": "104001003E575F00"
+        }
+    },
+    {
+        "id": "mexico",
+        "title": "Mexico Earthquake",
+        "lat": 19.32326586062324,
+        "lng": -99.22135634309514,
+        "news": "Post-disaster earthquake analysis. Disaster detected: mexico-earthquake.",
+        "images": {
+            "pre": "http://localhost:8000/test_images/mexico-earthquake_00000005_pre_disaster.png",
+            "post": "http://localhost:8000/test_images/mexico-earthquake_00000005_post_disaster.png"
+        },
+        "metadata": {
+            "sensor": "WORLDVIEW02",
+            "capture_date": "2017-09-20T17:46:11.000Z",
+            "disaster_type": "Earthquake",
+            "image_tag": "post_disaster",
+            "gsd_m": 2.65,
+            "pan_resolution_m": 0.66,
+            "off_nadir_angle_deg": 34.38,
+            "sun_azimuth_deg": 148.53,
+            "sun_elevation_deg": 68.67,
+            "target_azimuth_deg": 105.51,
+            "image_dimensions_px": "1024 \u00d7 1024",
+            "total_buildings": 284,
+            "coordinate_system": "WGS84",
+            "lng_range": [
+                -99.226,
+                -99.216
+            ],
+            "lat_range": [
+                19.318,
+                19.328
+            ],
+            "location": "Mexico City",
+            "catalog_id": "1030010072469D00"
+        }
+    },
+    {
+        "id": "palu",
+        "title": "Palu Tsunami",
+        "lat": -0.7342959335342167,
+        "lng": 119.8548555973514,
+        "news": "Post-disaster tsunami analysis. Disaster detected: palu-tsunami.",
+        "images": {
+            "pre": "http://localhost:8000/test_images/palu-tsunami_00000004_pre_disaster.png",
+            "post": "http://localhost:8000/test_images/palu-tsunami_00000004_post_disaster.png"
+        },
+        "metadata": {
+            "sensor": "WORLDVIEW02",
+            "capture_date": "2018-10-01T02:26:02.000Z",
+            "disaster_type": "Tsunami",
+            "image_tag": "post_disaster",
+            "gsd_m": 2.82,
+            "pan_resolution_m": 0.7,
+            "off_nadir_angle_deg": 36.44,
+            "sun_azimuth_deg": 96.5,
+            "sun_elevation_deg": 68.85,
+            "target_azimuth_deg": 221.88,
+            "image_dimensions_px": "1024 \u00d7 1024",
+            "total_buildings": 144,
+            "coordinate_system": "WGS84",
+            "lng_range": [
+                119.85,
+                119.86
+            ],
+            "lat_range": [
+                -0.739,
+                -0.729
+            ],
+            "location": "Palu, Indonesia",
+            "catalog_id": "10300100841CB500"
+        }
+    }
+]

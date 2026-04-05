@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 
 const DisasterOverlay = ({ alert, onClose }) => {
-    const [viewMode, setViewMode] = useState('pre');
     const [showBuildingOverlay, setShowBuildingOverlay] = useState(false);
-    const [showHeatmap, setShowHeatmap] = useState(false);
+    const [isMetadataOpen, setIsMetadataOpen] = useState(true);
 
     if (!alert) return null;
 
@@ -73,9 +72,7 @@ const DisasterOverlay = ({ alert, onClose }) => {
                         }}>
                             {alert.metadata?.disaster_type || 'DISASTER'}
                         </span>
-                        <span style={{ fontSize: '10px', opacity: 0.4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                            {alert.metadata?.image_tag?.replace('_', ' ') || 'SATELLITE ANALYSIS'}
-                        </span>
+
                     </div>
                     <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, lineHeight: 1.2 }}>{alert.title}</h2>
                     {alert.metadata?.location && (
@@ -92,36 +89,23 @@ const DisasterOverlay = ({ alert, onClose }) => {
                 }}>×</button>
             </div>
 
-            {/* ── Pre/Post Toggle ── */}
-            <div style={{ display: 'flex', gap: '0', margin: '0', borderBottom: '1px solid rgba(255,255,255,0.08)', borderRadius: '0', overflow: 'hidden', flexShrink: 0 }}>
-                <button className={`toggle-btn ${viewMode === 'pre' ? 'active-toggle' : 'inactive-toggle'}`} onClick={() => setViewMode('pre')}>
-                    ◎ Pre-Disaster
-                </button>
-                <button className={`toggle-btn ${viewMode === 'post' ? 'active-toggle' : 'inactive-toggle'}`} onClick={() => setViewMode('post')}>
-                    ◉ Post-Disaster
-                </button>
-            </div>
-
-            {/* ── Satellite Image (fixed height, always visible) ── */}
-            <div style={{ position: 'relative', width: '100%', height: '240px', background: '#000', flexShrink: 0 }}>
+            {/* ── Satellite Image (dynamic flex height) ── */}
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', background: '#000', overflow: 'hidden' }}>
                 <img
-                    key={viewMode}
-                    src={viewMode === 'pre' ? alert.images?.pre : alert.images?.post}
-                    alt={`${viewMode} disaster satellite view`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    key="post"
+                    src={alert.images?.post}
+                    alt={`post disaster satellite view`}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                     onError={e => { e.target.style.display = 'none'; }}
                 />
 
                 {/* Building overlays */}
-                {showBuildingOverlay && (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-                        <div style={{ position: 'absolute', top: '40%', left: '30%', width: '40px', height: '40px', border: viewMode === 'post' ? '2px solid #ff4d4d' : '2px solid #00ffcc', backgroundColor: viewMode === 'post' ? 'rgba(255,77,77,0.25)' : 'rgba(0,255,204,0.2)' }} />
-                        <div style={{ position: 'absolute', top: '60%', left: '50%', width: '35px', height: '25px', border: viewMode === 'post' ? '2px solid #ff4d4d' : '2px solid #00ffcc', backgroundColor: viewMode === 'post' ? 'rgba(255,77,77,0.25)' : 'rgba(0,255,204,0.2)' }} />
-                        <div style={{ position: 'absolute', top: '20%', left: '60%', width: '50px', height: '45px', border: viewMode === 'post' ? '2px solid #ffaa00' : '2px solid #00ffcc', backgroundColor: viewMode === 'post' ? 'rgba(255,170,0,0.25)' : 'rgba(0,255,204,0.2)' }} />
-                    </div>
-                )}
-                {showHeatmap && viewMode === 'post' && (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', background: 'radial-gradient(circle at 45% 55%, rgba(255,0,0,0.35) 0%, transparent 45%)' }} />
+                {showBuildingOverlay && alert.metadata.building_bounds && (
+                    <svg viewBox="0 0 1024 1024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+                        {alert.metadata.building_bounds.map((polyString, idx) => (
+                            <polygon key={idx} points={polyString} fill="rgba(255,77,77,0.2)" stroke="#ff4d4d" strokeWidth="1.5" />
+                        ))}
+                    </svg>
                 )}
 
                 {/* Image label badge */}
@@ -131,35 +115,47 @@ const DisasterOverlay = ({ alert, onClose }) => {
                     border: '1px solid rgba(255,255,255,0.15)',
                     borderRadius: '8px', padding: '4px 10px',
                     fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em',
-                    color: viewMode === 'pre' ? '#00ffcc' : '#ff7043'
+                    color: '#ff7043'
                 }}>
-                    {viewMode === 'pre' ? '● PRE-EVENT' : '● POST-EVENT'}
+                    ● LIVE SATELLITE FEED
                 </div>
             </div>
 
             {/* ── Scrollable Bottom Section ── */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 20px' }}>
+            <div style={{ flexShrink: 0, overflowY: 'auto', padding: '16px 20px 20px' }}>
 
                 {/* ML Filters */}
                 <div style={{ marginBottom: '16px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '12px 16px' }}>
                     <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.4, marginBottom: '10px' }}>ML Visualization Filters</div>
-                    <label className="filter-label">
-                        <input type="checkbox" checked={showBuildingOverlay} onChange={e => setShowBuildingOverlay(e.target.checked)} style={{ accentColor: '#00ffcc' }} />
-                        Building Detection Overlay
-                    </label>
                     <label className="filter-label" style={{ marginBottom: 0 }}>
-                        <input type="checkbox" checked={showHeatmap} onChange={e => setShowHeatmap(e.target.checked)} style={{ accentColor: '#00ffcc' }} />
-                        Damage Density Heatmap
+                        <input type="checkbox" checked={showBuildingOverlay} onChange={e => setShowBuildingOverlay(e.target.checked)} style={{ accentColor: '#ff4d4d' }} />
+                        AI Building Segmentation Mask
                     </label>
                 </div>
 
                 {/* First-Responder Metadata */}
                 {alert.metadata && (
                     <div>
-                        <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.4, marginBottom: '10px' }}>
-                            Operational Intelligence
+                        <div 
+                            onClick={() => setIsMetadataOpen(!isMetadataOpen)}
+                            style={{ 
+                                fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.8, 
+                                marginBottom: '10px', display: 'flex', justifyContent: 'space-between', 
+                                alignItems: 'center', cursor: 'pointer', padding: '4px 0'
+                            }}
+                        >
+                            <span>Metadata</span>
+                            <span style={{ transform: isMetadataOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease' }}>
+                                ▼
+                            </span>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        <div style={{ 
+                            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px',
+                            maxHeight: isMetadataOpen ? '500px' : '0',
+                            overflow: 'hidden',
+                            transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease',
+                            opacity: isMetadataOpen ? 1 : 0
+                        }}>
                             <div className="meta-pill" style={{ gridColumn: '1 / -1' }}>
                                 <span className="meta-label">Capture Date</span>
                                 <span className="meta-value">🗓 {alert.metadata.capture_date}</span>

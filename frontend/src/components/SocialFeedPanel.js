@@ -4,6 +4,7 @@ import axios from 'axios';
 const SocialFeedPanel = ({ alert }) => {
     const [feed, setFeed] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     useEffect(() => {
         if (!alert) {
@@ -34,10 +35,11 @@ const SocialFeedPanel = ({ alert }) => {
     return (
         <div className="clean-panel" style={{
             position: 'absolute',
-            top: 130,
-            left: 30,
             bottom: 30,
-            width: '380px',
+            left: 30,
+            width: isMinimized ? '280px' : '380px',
+            height: isMinimized ? '58px' : 'calc(100vh - 160px)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             background: 'rgba(20, 25, 35, 0.95)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
@@ -84,78 +86,65 @@ const SocialFeedPanel = ({ alert }) => {
             </style>
             
             <div style={{
-                padding: '20px 24px', 
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                padding: '16px 20px', 
+                borderBottom: isMinimized ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
                 background: 'rgba(255, 255, 255, 0.02)',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '600', margin: 0, color: '#fff' }}>
-                    Social Media Updates
+                alignItems: 'center',
+                cursor: 'pointer'
+            }} onClick={() => setIsMinimized(!isMinimized)}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0, color: '#fff', whiteSpace: 'nowrap' }}>
+                    Live News Updates
                 </h3>
-                <div style={{ fontSize: '0.8rem', color: '#ff6b6b', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff6b6b', animation: 'pulseNews 2s infinite' }}></div>
-                    LIVE
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#ff6b6b', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff6b6b', animation: 'pulseNews 2s infinite' }}></div>
+                        LIVE
+                    </div>
+                    <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 'bold', fontSize: '1.2rem', lineHeight: '1' }}>
+                        {isMinimized ? '+' : '−'}
+                    </span>
                 </div>
             </div>
             
-            <div className="scrollable-feed" style={{ padding: alert && (alert.id === 'harvey' || alert.id === 'florence') ? '12px' : '20px', overflowY: 'auto', flex: 1 }}>
+            {!isMinimized && (
+                <div className="scrollable-feed" style={{ padding: '20px', overflowY: 'auto', flex: 1 }}>
                 {loading ? (
-                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '40px 0' }}>Decrypting streams...</div>
+                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '40px 0' }}>Fetching latest news...</div>
                 ) : feed.length === 0 ? (
-                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '40px 0' }}>No local intel available.</div>
-                ) : alert && (alert.id === 'harvey' || alert.id === 'florence') ? (
-                    // Harvey / Florence: show only full-width images, no text
-                    feed.filter(item => item.image).map(item => (
-                        <div key={item.id} style={{ marginBottom: '12px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <img
-                                src={item.image}
-                                alt="Disaster imagery"
-                                style={{ width: '100%', height: 'auto', display: 'block' }}
-                            />
-                        </div>
-                    ))
+                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '40px 0' }}>No news updates available.</div>
                 ) : (
                     feed.map(item => (
-                        <div key={item.id} className="feed-card">
-                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-                                <img 
-                                    src={item.avatar} 
-                                    alt={item.author}
-                                    style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }}
-                                />
-                                <div style={{ marginLeft: '12px' }}>
-                                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600' }}>{item.author}</h4>
-                                    <div style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '2px' }}>
-                                        {item.platform} • {item.time}
-                                    </div>
-                                </div>
+                        <div key={item.id} className="feed-card" style={{ padding: '16px' }}>
+                            <div style={{ marginBottom: '8px' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#00ffcc', background: 'rgba(0, 255, 204, 0.1)', padding: '2px 8px', borderRadius: '4px' }}>
+                                    {item.platform}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', opacity: 0.5, marginLeft: '8px' }}>
+                                    {item.time}
+                                </span>
                             </div>
-                            
-                            <p style={{ margin: '0 0 12px 0', fontSize: '0.95rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.9)' }}>
-                                {item.content}
-                            </p>
-                            
-                            {item.image && (
-                                <div style={{ 
-                                    width: '100%', 
-                                    height: '160px', 
-                                    borderRadius: '12px', 
-                                    overflow: 'hidden',
-                                    border: '1px solid rgba(255,255,255,0.1)'
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: '500', lineHeight: '1.4', color: '#fff' }}>
+                                {item.title || item.content}
+                            </h4>
+                            {item.url && (
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" style={{
+                                    display: 'inline-block',
+                                    fontSize: '0.85rem',
+                                    color: '#4fc3f7',
+                                    textDecoration: 'none',
+                                    marginTop: '4px',
+                                    fontWeight: '500'
                                 }}>
-                                    <img 
-                                        src={item.image} 
-                                        alt="Intel visual" 
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
-                                </div>
+                                    Read Full Article →
+                                </a>
                             )}
                         </div>
                     ))
                 )}
             </div>
+            )}
         </div>
     );
 };
