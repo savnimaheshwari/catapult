@@ -46,12 +46,12 @@ All models were trained and evaluated on the **[xBD Dataset](https://xview2.org/
 
 Four deep learning models were built and trained as part of this project:
 
-| Model | What it does | Best Accuracy |
+| Model | What it does | Accuracy |
 |---|---|---|
-| Pre/Post Classifier | Determines whether a satellite image was captured before or after a disaster event | **86.8%** test accuracy (AUC 0.95) |
-| Building Segmentation (U-Net) | Identifies and segments individual building footprints in a satellite scene | **93.4%** test accuracy |
-| Damage Classifier | Classifies each detected building into one of four damage levels: No Damage, Minor, Major, or Destroyed | **80.9%** test accuracy |
-| Disaster Type Classifier | Identifies the category of disaster (flooding, fire, earthquake, volcano, tsunami, wind) from the image | **73.8%** train accuracy |
+| Pre/Post Classifier | Determines whether a satellite image was captured before or after a disaster event | **86.8%** (AUC 0.95) |
+| Building Segmentation (U-Net) | Identifies and segments individual building footprints in a satellite scene | **93.4%** |
+| Damage Classifier | Classifies each overall image into one of four damage levels: No Damage, Minor, Major, or Destroyed | **80.9%** |
+| Disaster Type Classifier | Identifies the category of disaster (flooding, fire, earthquake, volcano, tsunami, wind) from the image | **73.8%** |
 
 ---
 
