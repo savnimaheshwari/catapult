@@ -17,7 +17,7 @@ Active disaster zones are rendered as pulsing red beacons on a realistic 3D glob
 | Hurricane Florence | Jacksonville, NC | 12 |
 | Santa Rosa Wildfire (Tubbs Fire) | Santa Rosa, CA | 160 |
 
-In production, this would be connected to a live satellite through an AWS clust
+In production, this would be connected to a live satellite through an AWS instance.
 
 Clicking a marker smoothly zooms the globe to street level and opens the intelligence panel.
 
