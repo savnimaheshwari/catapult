@@ -51,7 +51,7 @@ const DisasterOverlay = ({ alert, onClose }) => {
                 <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'pointer', opacity: 0.7 }}>×</button>
             </div>
 
-            <div style={{ flex: 1, position: 'relative', background: '#000' }}>
+            <div style={{ flex: 1, position: 'relative', background: '#000', minHeight: 0 }}>
                 <img 
                     src={viewMode === 'pre' ? alert.images.pre : alert.images.post} 
                     alt="Satellite View" 
@@ -73,7 +73,7 @@ const DisasterOverlay = ({ alert, onClose }) => {
                 )}
             </div>
 
-            <div style={{ padding: '24px' }}>
+            <div style={{ padding: '24px', overflowY: 'auto', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderRadius: '8px', overflow: 'hidden' }}>
                     <button className={`toggle-btn ${viewMode === 'pre' ? 'active-toggle' : 'inactive-toggle'}`} onClick={() => setViewMode('pre')}>
                         PRE-DISASTER
