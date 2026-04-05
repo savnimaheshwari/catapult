@@ -2,20 +2,22 @@
 
 > **"Making a first response the fastest response."**
 
-ProjectSendHelp is a disaster intelligence platform built for FEMA and emergency-response agencies. It processes real-time post-disaster satellite imagery through deep learning models to give first responders instant situational awareness — identifying disaster types, mapping affected buildings, and surfacing live news — all from a cinematic 3D globe interface.
+ProjectSendHelp is a disaster intelligence platform built for FEMA and emergency-response agencies. It processes real-time post-disaster satellite imagery through deep learning models to give first responders instant situational awareness — identifying disaster types, mapping affected buildings, and surfacing live news — all from a straightforward and easy-to-use interface.
 
 ---
 
 ## Features
 
 ### Live Disaster Hotspots
-Active disaster zones are rendered as pulsing red beacons on a photorealistic 3D globe. The current hotspots are sourced from real xBD-dataset satellite imagery:
+Active disaster zones are rendered as pulsing red beacons on a realistic 3D globe. The current hotspots are sourced from real xBD-dataset satellite imagery:
 
 | Event | Location | Buildings Detected |
 |---|---|---|
 | Hurricane Harvey | Houston, TX | 197 |
 | Hurricane Florence | Jacksonville, NC | 12 |
 | Santa Rosa Wildfire (Tubbs Fire) | Santa Rosa, CA | 160 |
+
+In production, this would be connected to a live satellite through an AWS clust
 
 Clicking a marker smoothly zooms the globe to street level and opens the intelligence panel.
 
