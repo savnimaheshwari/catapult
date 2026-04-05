@@ -19,8 +19,6 @@ Active disaster zones are rendered as pulsing red beacons on a realistic 3D glob
 
 In production, this would be connected to a live satellite through an AWS instance.
 
-Clicking a marker smoothly zooms the globe to street level and opens the intelligence panel.
-
 ### Satellite Intelligence Panel
 Each hotspot displays its post-disaster GeoEye-1 or WorldView satellite image alongside key sensor metadata — capture date, ground resolution (GSD), off-nadir angle, sun azimuth, and geographic coverage.
 
@@ -28,7 +26,7 @@ Each hotspot displays its post-disaster GeoEye-1 or WorldView satellite image al
 Toggling the "AI Building Segmentation Mask" checkbox overlays the predictions of a trained deep learning model directly on the satellite image. The model identifies building footprints as translucent red polygons, letting responders instantly see which structures exist in the affected zone.
 
 ### Live News Feed
-Each disaster zone is linked to a real-time news feed pulled dynamically from Google News, surfacing the latest relevant articles for that specific event.
+Each disaster zone is linked to a real-time news feed pulled dynamically from Google News, surfacing the latest relevant articles for that specific event. In this case, since the disasters demo-ed are old, the news is anything relevant from recent times.
 
 ### Social Feed Panel
 A minimizable capsule in the bottom-left corner simulates a live social intelligence feed — aggregating keyword signals the way a real system would monitor Twitter/X Firehose, USGS feeds, and emergency scanner data.
