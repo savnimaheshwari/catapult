@@ -2,7 +2,7 @@
 
 > **"Reducing the 48-hour disaster assessment window to 48 seconds."**
 
-TerraForm Response is a full-stack disaster intelligence platform that combines real-time satellite imagery, deep learning building segmentation, and A\* pathfinding to give first responders actionable situational awareness within seconds of a disaster event.
+TerraForm Response is a full-stack disaster intelligence platform that combines real-time satellite imagery and deep learning building segmentation to give first responders actionable situational awareness within seconds of a disaster event.
 
 ---
 
@@ -28,8 +28,7 @@ TerraForm Response is built for FEMA and emergency-response agencies. When a dis
 1. **Classifies** the type of disaster from satellite imagery
 2. **Segments** all buildings in the scene using a trained U-Net model
 3. **Renders** the annotated scene on a cinematic 3D Mapbox globe in near real-time
-4. **Routes** emergency vehicles around damaged infrastructure using graph pathfinding
-5. **Verifies** users are human via Worldcoin World ID before granting access to the system
+4. **Verifies** users are human via Worldcoin World ID before granting access to the system
 
 ---
 
@@ -50,13 +49,13 @@ TerraForm Response is built for FEMA and emergency-response agencies. When a dis
 ┌──────────▼──────────────────────────────────────────────────────────┐
 │                        FastAPI Backend                              │
 │                                                                     │
-│   ┌─────────────────┐    ┌──────────────────┐    ┌──────────────┐  │
-│   │   ml_engine.py  │    │  pathfinder.py   │    │  World ID    │  │
-│   │                 │    │                  │    │  Verifier    │  │
-│   │ ┌─────────────┐ │    │  NetworkX A*     │    │  /verify-    │  │
-│   │ │disaster_type│ │    │  Grid Pathfind   │    │  human       │  │
-│   │ │  _model.h5  │ │    │  Safe Route Calc │    └──────────────┘  │
-│   │ └─────────────┘ │    └──────────────────┘                      │
+│   ┌─────────────────┐                          ┌──────────────┐  │
+│   │   ml_engine.py  │                          │  World ID    │  │
+│   │                 │                          │  Verifier    │  │
+│   │ ┌─────────────┐ │                          │  /verify-    │  │
+│   │ │disaster_type│ │                          │  human       │  │
+│   │ │  _model.h5  │ │                          └──────────────┘  │
+│   │ └─────────────┘ │                                             │
 │   │ ┌─────────────┐ │                                               │
 │   │ │  building_  │ │                                               │
 │   │ │segmentation │ │                                               │
@@ -91,13 +90,7 @@ Clicking any marker zooms the globe to street level and opens the intelligence p
 ### 🧠 ML Building Segmentation Overlay
 When the "AI Building Segmentation Mask" checkbox is enabled, the `building_segmentation.h5` model runs inference on the satellite image and renders detected building polygons directly on top of the imagery. Polygons are extracted using OpenCV contour tracing and rendered at 1024×1024 coordinate precision.
 
-### 🗺️ A* Emergency Routing
-Clicking "Plot Emergency Route" triggers the `pathfinder.py` module, which:
-1. Builds a 30×30 grid graph over the disaster area using NetworkX
-2. Adds diagonal edges for smoother, more realistic paths
-3. Marks damaged nodes with infinite weight
-4. Computes shortest safe path using `nx.shortest_path`
-5. Renders the route as a neon line on the Mapbox globe
+
 
 ### 📰 Live News Feed
 Each disaster hotspot pulls real-time news from Google News RSS, displaying the top 5 articles relevant to the event (e.g., "Hurricane Harvey Houston flooding").
@@ -223,34 +216,6 @@ Fetches top 5 live news articles from Google News RSS for the given disaster eve
 ```
 
 ---
-
-### `POST /analyze-disaster`
-Triggers damage heatmap generation and A* route calculation for a given coordinate pair.
-
-**Request body:**
-```json
-{
-  "lat": 29.747,
-  "lng": -95.537,
-  "dest_lat": 29.797,
-  "dest_lng": -95.587
-}
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "damage_heatmap": {
-    "type": "FeatureCollection",
-    "features": [...]
-  },
-  "route": {
-    "type": "Feature",
-    "geometry": { "type": "LineString", "coordinates": [[lng, lat], ...] }
-  }
-}
-```
 
 ---
 
@@ -400,7 +365,6 @@ Catapult/
 ├── backend/
 │   ├── main.py               # FastAPI app, all API endpoints
 │   ├── ml_engine.py          # TF model loading & inference (classify + segment)
-│   ├── pathfinder.py         # NetworkX A* safe route calculation
 │   └── requirements.txt      # Python dependencies
 │
 ├── frontend/
@@ -445,7 +409,7 @@ Catapult/
 | **Backend** | FastAPI, Uvicorn, Python 3.10 |
 | **ML Inference** | TensorFlow / Keras (`.h5` models) |
 | **Computer Vision** | OpenCV (`cv2`) — contour extraction, morphological ops |
-| **Graph Pathfinding** | NetworkX — A\* on 30×30 grid with diagonal edges |
+
 | **Human Verification** | Worldcoin World ID (IDKit v4, HMAC-signed RP) |
 | **Satellite Imagery** | xBD Dataset — GeoEye-1, WorldView-2/3 imagery |
 | **Map Rendering** | Mapbox GL JS — satellite-streets v12, globe projection |
