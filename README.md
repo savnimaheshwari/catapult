@@ -32,7 +32,7 @@ Each disaster zone is linked to a real-time news feed pulled dynamically from Go
 A minimizable capsule in the bottom-left corner simulates a live social intelligence feed — aggregating keyword signals the way a real system would monitor Twitter/X Firehose, USGS feeds, and emergency scanner data.
 
 ### Proof-of-Human Verification
-Access to the platform is gated by **World ID** (by Worldcoin), a sybil-resistant Proof-of-Human protocol. This ensures only verified humans — not bots — can interact with the emergency infrastructure.
+Access to the platform is gated by **World ID**. This ensures only verified humans — not bots — can interact with the emergency infrastructure.
 
 ---
 
