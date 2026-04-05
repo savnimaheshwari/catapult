@@ -81,7 +81,7 @@ const WorldIDAuth = ({ children }) => {
             <div className="auth-card">
                 <div className="auth-logo">🌍</div>
                 <h1>ProjectSendHelp</h1>
-                <p>Emergency infrastructure gated by <strong>Proof-of-Human</strong>.</p>
+                <p>Emergency infrastructure gated by <strong>World ID</strong>.</p>
                 <p className="auth-subtext">Verification prevents bot spam and ensures authentic damage reporting.</p>
                 
                 {loading ? (
